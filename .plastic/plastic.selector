@@ -1,0 +1,4 @@
+repository "FrogGame@belentsov02@cloud"
+  path "/"
+    br "/main"
+    co "/main"

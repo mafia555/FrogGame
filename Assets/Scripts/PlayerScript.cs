@@ -11,15 +11,13 @@ public class PlayerScript : MonoBehaviour
     public Rigidbody2D rb;
     SpriteRenderer sprite;
 
-    void Start()
-    {
+    void Start() {
         animator = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void Update()
-    {
+    void Update() {
     Walk();
     Reflect();
     Jump();
@@ -28,16 +26,15 @@ public class PlayerScript : MonoBehaviour
 
     public Vector2 moveVector;
     public int speed = 3;
-    void Walk()
-    {
+
+    void Walk() {
     moveVector.x = Input.GetAxisRaw("Horizontal");
     rb.velocity = new Vector2(moveVector.x * speed, rb.velocity.y);
     animator.SetFloat("moveX", Mathf.Abs(moveVector.x));
     }
 
     public bool faceRight = true;
-    void Reflect()
-    {
+    void Reflect() {
     if ((moveVector.x > 0 && !faceRight) || (moveVector.x < 0 && faceRight))
         {
     transform.localScale *= new Vector2(-1, 1);
@@ -47,12 +44,23 @@ public class PlayerScript : MonoBehaviour
 
     public bool onGround;
     public float jumpForce;
-    void Jump()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && onGround)
+    private bool jumpControl;
+    private int jumpIteration = 0;
+    public int jumpValueIteration = 60;
+
+    void Jump() {
+        if (Input.GetKey(KeyCode.Space))
         {
-            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+           if (onGround) { jumpControl = true; }
         }
+        else { jumpControl = false; }
+
+        if (jumpControl) {
+            if (jumpIteration++ < jumpValueIteration) {
+                rb.AddForce(Vector2.up  * jumpForce / jumpIteration);
+            }
+        }
+        else { jumpIteration = 0; }
     }
 
 
@@ -60,8 +68,7 @@ public class PlayerScript : MonoBehaviour
     public LayerMask Ground;
     public Transform GroundCheck;
     public float GroundCheckRadius;
-    void CheckingGround()
-    {
+    void CheckingGround() {
     onGround = Physics2D.OverlapCircle(GroundCheck.position, GroundCheckRadius, Ground);
     animator.SetBool("onGround", onGround);
     }
